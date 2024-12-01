@@ -6,6 +6,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.stream.Stream;
 
@@ -26,8 +27,8 @@ public class Day1 {
         try (Stream<String> linestream = Files.lines(path)) {
             Pair pair = getPair(linestream);
             var totalSimilarityScore = 0;
-            for (Integer number : pair.firsts) {
-                totalSimilarityScore += number * calculateOccurrences(number, pair.seconds);
+            for (Integer leftValue : pair.left) {
+                totalSimilarityScore += leftValue * calculateOccurrences(leftValue, pair.right);
             }
             return totalSimilarityScore;
         } catch (IOException e) {
@@ -35,10 +36,10 @@ public class Day1 {
         }
     }
 
-    private Integer calculateOccurrences(Integer number, ArrayList<Integer> seconds) {
+    private Integer calculateOccurrences(Integer valueToCheck, List<Integer> list) {
         var occurrences = 0;
-        for (Integer second : seconds) {
-            if (Objects.equals(second, number)) {
+        for (Integer value : list) {
+            if (Objects.equals(value, valueToCheck)) {
                 occurrences++;
             }
         }
@@ -51,15 +52,15 @@ public class Day1 {
             Pair pair = getPair(linestream);
 
             // Sort the lists in numerical order
-            pair.firsts().sort(Integer::compareTo);
-            pair.seconds().sort(Integer::compareTo);
+            pair.left().sort(Integer::compareTo);
+            pair.right().sort(Integer::compareTo);
 
             // Calculate the distance between each pair
             var totalDistance = 0;
-            for (int i = 0; i < pair.firsts().size(); i++) {
-                var first = pair.firsts().get(i);
-                var second = pair.seconds().get(i);
-                var distance = Math.abs(first - second);
+            for (int i = 0; i < pair.left().size(); i++) {
+                var left = pair.left().get(i);
+                var right = pair.right().get(i);
+                var distance = Math.abs(left - right);
                 totalDistance += distance;
             }
 
@@ -73,19 +74,18 @@ public class Day1 {
         var lines = linestream.toList();
 
         // Split the lines into two separate lists
-        var firsts = new ArrayList<Integer>();
-        var seconds = new ArrayList<Integer>();
+        var left = new ArrayList<Integer>();
+        var right = new ArrayList<Integer>();
 
         for (String line : lines) {
             var x = line.split(" {3}");
-            firsts.add(Integer.parseInt(x[0]));
-            seconds.add(Integer.parseInt(x[1]));
+            left.add(Integer.parseInt(x[0]));
+            right.add(Integer.parseInt(x[1]));
         }
-        Pair result = new Pair(firsts, seconds);
-        return result;
+        return new Pair(left, right);
     }
 
 
-    private record Pair(ArrayList<Integer> firsts, ArrayList<Integer> seconds) {
+    private record Pair(ArrayList<Integer> left, ArrayList<Integer> right) {
     }
 }
