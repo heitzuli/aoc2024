@@ -11,15 +11,41 @@ import java.util.stream.Stream;
 
 public class Day1 {
     public static void main(String[] args) {
+        var fileName = "Day1.txt";
         try {
-            System.out.println(new Day1().getTotalDistance());
+            System.out.println(new Day1().getTotalDistance(fileName));
+            System.out.println(new Day1().getTotalSimilarityScore(fileName));
         } catch (URISyntaxException e) {
             e.printStackTrace();
         }
     }
 
-    private Integer getTotalDistance() throws URISyntaxException {
-        var fileName = "Day1.txt";
+    private Integer getTotalSimilarityScore(String fileName) throws URISyntaxException {
+        Path path = Paths.get(Objects.requireNonNull(getClass().getClassLoader().getResource(fileName)).toURI());
+
+        try (Stream<String> linestream = Files.lines(path)) {
+            Pair pair = getPair(linestream);
+            var totalSimilarityScore = 0;
+            for (Integer number : pair.firsts) {
+                totalSimilarityScore += number * calculateOccurrences(number, pair.seconds);
+            }
+            return totalSimilarityScore;
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private Integer calculateOccurrences(Integer number, ArrayList<Integer> seconds) {
+        var occurrences = 0;
+        for (Integer second : seconds) {
+            if (Objects.equals(second, number)) {
+                occurrences++;
+            }
+        }
+        return occurrences;
+    }
+
+    private Integer getTotalDistance(String fileName)throws URISyntaxException {
         Path path = Paths.get(Objects.requireNonNull(getClass().getClassLoader().getResource(fileName)).toURI());
         try (Stream<String> linestream = Files.lines(path)) {
             Pair pair = getPair(linestream);
@@ -58,6 +84,7 @@ public class Day1 {
         Pair result = new Pair(firsts, seconds);
         return result;
     }
+
 
     private record Pair(ArrayList<Integer> firsts, ArrayList<Integer> seconds) {
     }
